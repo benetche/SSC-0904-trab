@@ -1,9 +1,9 @@
 {
   "name": "node-api",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "pm2 start index.js --watch --no-daemon ",
-    "dev": "nodemon index.js"
+    "start": "pm2 start server.js --watch --no-daemon ",
+    "dev": "nodemon server.js"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",

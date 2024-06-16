@@ -1,22 +1,24 @@
-import restify from "restify";
+import express from "express";
+import mongoose from "mongoose";
+import pacienteRoutes from "./routes/paciente-routes.js";
+import convenioRoutes from "./routes/convenio-routes.js";
 
-export const server = restify.createServer();
-const { SERVER_PORT } = process.env;
+const DB_USER = "admin";
+const DB_PASSWORD = "admin";
+const DB_HOST = "db";
+const DB_PORT = "27017";
+const DB_NAME = "db";
+const app = express();
 
-server.use(
-  restify.plugins.queryParser({
-    mapParams: false,
-    allowDots: true,
-  })
-);
+const URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`;
 
-server.use(
-  restify.plugins.bodyParser({
-    mapParams: false,
-  })
-);
+mongoose.connect(URI);
+app.use(express.json());
 
-server.start = (onStart) => {
-  server.listen(`${SERVER_PORT}`, "localhost", onStart);
-  return server;
-};
+app.use([pacienteRoutes, convenioRoutes]);
+
+const port = 3001;
+
+app.listen(port, () => {
+  console.log(`Server listening to port:${port}`);
+});
