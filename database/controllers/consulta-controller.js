@@ -1,8 +1,7 @@
 import mongoose from 'mongoose';
-import Consulta from '../models/consulta.js;
+import Consulta from '../models/consulta.js';
 
 const consultaController = {
-  // Cria uma nova consulta
   post: async (req, res) => {
     try {
       const dados = req.body;

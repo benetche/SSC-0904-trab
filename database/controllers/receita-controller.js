@@ -6,7 +6,6 @@ const receitaController = {
     try {
       const dados = req.body;
 
-      // TODO: validar dados da nova receita
       const receita = new Receita(dados);
 
       await receita.save();
