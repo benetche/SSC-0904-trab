@@ -12,7 +12,7 @@ import medicamentoRoutes from './routes/medicamento-routes.js';
 
 const DB_USER = "admin";
 const DB_PASSWORD = "admin"
-const DB_HOST = "localhost";
+const DB_HOST = "db";
 const DB_PORT = "27017";
 const DB_NAME = "db";
 const app = express();
