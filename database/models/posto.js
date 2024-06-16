@@ -23,7 +23,7 @@ const postoSchema = new mongoose.Schema({
         ref: "Medicamento",
       },
       quantidade: {
-        type: number,
+        type: Number,
         required: true,
       },
     },
