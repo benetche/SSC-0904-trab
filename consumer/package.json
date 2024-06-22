@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "kafkajs": "^2.2.4"
+  },
+  "name": "consumer",
+  "version": "1.0.0",
+  "main": "consumer.js",
+  "devDependencies": {
+    "nodemon": "^3.1.3"
+  },
+  "scripts": {
+    "dev": "nodemon consumer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module"
+}

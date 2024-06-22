@@ -1,4 +1,4 @@
-import Paciente from "../models/paciente.js";
+import Paciente from "../../database/models/paciente.js";
 import mongoose from "mongoose";
 
 class PacienteController {

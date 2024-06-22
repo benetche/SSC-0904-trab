@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "express": "^4.19.2",
+    "kafkajs": "^2.2.4",
+    "nodemon": "^3.1.3",
+    "pm2": "^5.4.0"
+  },
+  "name": "producer",
+  "version": "1.0.0",
+  "main": "producer.js",
+  "devDependencies": {},
+  "scripts": {
+    "dev": "nodemon producer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module"
+}

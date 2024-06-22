@@ -1,4 +1,4 @@
-import Medico from '../models/medico.js';
+import Medico from "../../database/models/medico.js";
 
 const medicoController = {
   // Cria um novo médico
@@ -8,13 +8,13 @@ const medicoController = {
       const medico = new Medico(dados);
       await medico.save();
       res.status(201).json({
-        message: 'Médico cadastrado com sucesso!',
+        message: "Médico cadastrado com sucesso!",
         medico,
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({
-        message: 'Falha ao processar requisição',
+        message: "Falha ao processar requisição",
         error: error.message,
       });
     }
@@ -27,7 +27,7 @@ const medicoController = {
       res.status(200).json(medicos);
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao processar requisição',
+        message: "Falha ao processar requisição",
         error: error.message,
       });
     }
@@ -39,13 +39,13 @@ const medicoController = {
       const medico = await Medico.findOne({ cpf: req.params.cpf });
       if (!medico) {
         return res.status(404).json({
-          message: 'Médico não encontrado',
+          message: "Médico não encontrado",
         });
       }
       res.status(200).json(medico);
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao processar requisição getByCpf',
+        message: "Falha ao processar requisição getByCpf",
         error: error.message,
       });
     }
@@ -61,16 +61,16 @@ const medicoController = {
       );
       if (!medico) {
         return res.status(404).json({
-          message: 'Médico não encontrado',
+          message: "Médico não encontrado",
         });
       }
       res.status(200).json({
-        message: 'Médico atualizado com sucesso',
+        message: "Médico atualizado com sucesso",
         medico,
       });
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao processar requisição updateByCpf',
+        message: "Falha ao processar requisição updateByCpf",
         error: error.message,
       });
     }
@@ -82,15 +82,15 @@ const medicoController = {
       const medico = await Medico.findOneAndDelete({ cpf: req.params.cpf });
       if (!medico) {
         return res.status(404).json({
-          message: 'Médico não encontrado',
+          message: "Médico não encontrado",
         });
       }
       res.status(200).json({
-        message: 'Médico removido com sucesso!',
+        message: "Médico removido com sucesso!",
       });
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao remover médico',
+        message: "Falha ao remover médico",
         error: error.message,
       });
     }
@@ -98,4 +98,3 @@ const medicoController = {
 };
 
 export default medicoController;
-

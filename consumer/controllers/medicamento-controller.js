@@ -1,53 +1,61 @@
-import Medicamento from '../models/medicamento.js';
+import Medicamento from "../../database/models/medicamento.js";
 
 const medicamentoController = {
   // Cria um novo medicamento
-  post: async (req, res) => {
+  post: async (data, producer) => {
     try {
-      const dados = req.body;
+      const dados = data;
       const medicamento = new Medicamento(dados);
       await medicamento.save();
-      res.status(201).json({
-        message: 'Medicamento cadastrado com sucesso!',
-        medicamento,
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: `Medicamento ${dados} criado`,
+          },
+        ],
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({
-        message: 'Falha ao processar requisição',
-        error: error.message,
-      });
     }
   },
 
   // Retorna todos os medicamentos
-  getAll: async (req, res) => {
+  getAll: async (data, producer) => {
     try {
       const medicamentos = await Medicamento.find({});
       res.status(200).json(medicamentos);
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao processar requisição',
+        message: "Falha ao processar requisição",
         error: error.message,
       });
     }
   },
 
   // Retorna um medicamento pelo código
-  getByCodigo: async (req, res) => {
+  getByCodigo: async (data, producer) => {
     try {
-      const medicamento = await Medicamento.findOne({ codigo: req.params.codigo });
+      const medicamento = await Medicamento.findOne({
+        codigo: data,
+      });
       if (!medicamento) {
-        return res.status(404).json({
-          message: 'Medicamento não encontrado',
+        console.log("Medicamento não encontrado");
+      } else {
+        const message = {
+          medicamento: medicamento,
+        };
+        await producer.send({
+          topic: "responses",
+          messages: [
+            {
+              value: JSON.stringify(message),
+            },
+          ],
         });
       }
-      res.status(200).json(medicamento);
     } catch (error) {
-      res.status(500).json({
-        message: 'Falha ao processar requisição getByCodigo',
-        error: error.message,
-      });
+      console.error({ message: "Erro em getByCodigo" });
     }
   },
 
@@ -61,16 +69,16 @@ const medicamentoController = {
       );
       if (!medicamento) {
         return res.status(404).json({
-          message: 'Medicamento não encontrado',
+          message: "Medicamento não encontrado",
         });
       }
       res.status(200).json({
-        message: 'Medicamento atualizado com sucesso',
+        message: "Medicamento atualizado com sucesso",
         medicamento,
       });
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao processar requisição updateByCodigo',
+        message: "Falha ao processar requisição updateByCodigo",
         error: error.message,
       });
     }
@@ -79,18 +87,20 @@ const medicamentoController = {
   // Exclui um medicamento pelo código
   delete: async (req, res) => {
     try {
-      const medicamento = await Medicamento.findOneAndDelete({ codigo: req.params.codigo });
+      const medicamento = await Medicamento.findOneAndDelete({
+        codigo: req.params.codigo,
+      });
       if (!medicamento) {
         return res.status(404).json({
-          message: 'Medicamento não encontrado',
+          message: "Medicamento não encontrado",
         });
       }
       res.status(200).json({
-        message: 'Medicamento removido com sucesso!',
+        message: "Medicamento removido com sucesso!",
       });
     } catch (error) {
       res.status(500).json({
-        message: 'Falha ao remover medicamento',
+        message: "Falha ao remover medicamento",
         error: error.message,
       });
     }
@@ -98,4 +108,3 @@ const medicamentoController = {
 };
 
 export default medicamentoController;
-
