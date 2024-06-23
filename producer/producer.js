@@ -5,6 +5,7 @@ import medicamentoRoutes from "./routes/medicamentoRoutes.js";
 import medicoRoutes from "./routes/medicoRoutes.js";
 import farmaceuticoRoutes from "./routes/farmaceuticoRoutes.js";
 import postoRoutes from "./routes/postoRoutes.js";
+import receitaRoutes from "./routes/receitaRoutes.js";
 
 const app = express();
 
@@ -42,7 +43,7 @@ app.use("/api/medicamento", medicamentoRoutes);
 app.use("/api/medico", medicoRoutes);
 app.use("/api/farmaceutico", farmaceuticoRoutes);
 app.use("/api/posto", postoRoutes);
-
+app.use("/api/receita", receitaRoutes);
 const responses = {};
 
 app.get("/subscribe/medicamento/get/:codigo", (req, res) => {
@@ -62,7 +63,7 @@ app.get("/subscribe/:type/:id?", (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
-  console.log("key:", key);
+
   responses[key] = res;
   res.on("close", () => {
     delete responses[key];
@@ -79,26 +80,29 @@ async function run() {
     eachMessage: async ({ topic, partition, message }) => {
       const { data, method } = JSON.parse(message.value.toString());
       console.log("Resposta", method);
-      // let key;
-      // switch (method.toString()) {
-      //   case "medicamentoGetByCodigo":
-      //     key = `${method}:${data.codigo}`;
-      //     break;
-      //   case "medicamentoGetAll":
-      //     console.log("entrou");
-      //     key = `medicamento:getAll`;
-      //     console.log(key);
-      //     break;
-
-      //   default:
-      //     key = `medico:create`;
-      //     break;
-      // }
-      // const res = responses[key];
-      // if (res) {
-      //   res.write(`data: ${JSON.stringify({ method, data })}\n\n`);
-      //   delete responses[key];
-      // }
+      let key;
+      switch (method.toString()) {
+        case "medicamentoGetByCodigo":
+          key = `${method}:${data.codigo}`;
+          break;
+        case "medicamentoGetAll":
+          key = `medicamento:getAll`;
+          break;
+        case "medicoGetAll":
+          key = "medico:getAll";
+          break;
+        case "receitaCreate":
+          key = `receita:create`;
+          break;
+        default:
+          key = `medico:create`;
+          break;
+      }
+      const res = responses[key];
+      if (res) {
+        res.write(`data: ${JSON.stringify({ method, data })}\n\n`);
+        delete responses[key];
+      }
     },
   });
 

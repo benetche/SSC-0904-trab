@@ -1,47 +1,45 @@
-import mongoose from 'mongoose';
-
-const receituarioModel = new mongoose.Schema({
-  medicamento: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Medicamento',
-    required: true,
-  },
-  frequencia: {
-    type: Number,
-    required: true,
-  },
-  dose: {
-    type: String,
-    required: true,
-  },
-});
+import mongoose from "mongoose";
 
 const receitaSchema = new mongoose.Schema({
   cod_receita: {
     type: String,
     required: true,
-    index: true,
+    unique: true,
   },
   receituario: {
-    type: [receituarioModel],
-    default: () => ({}),
+    type: {
+      medicamento: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Medicamento",
+        required: true,
+      },
+      frequencia: {
+        type: String,
+        required: true,
+      },
+      dose: {
+        type: String,
+        required: true,
+      },
+    },
+    required: true,
   },
   validade: {
-    type: Date,
+    type: String,
     required: true,
   },
   medico: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Funcionario',
+    ref: "Medico",
     required: true,
   },
   paciente: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Paciente',
+    ref: "Paciente",
     required: true,
   },
 });
 
-const receita = mongoose.model('Receita', receitaSchema);
+const receita = mongoose.model("Receita", receitaSchema);
 
 export default receita;

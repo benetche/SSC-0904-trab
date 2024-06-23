@@ -4,6 +4,7 @@ import medicamentoController from "./controllers/medicamento-controller.js";
 import medicoController from "./controllers/medico-controller.js";
 import farmaceuticoController from "./controllers/farmaceutico-controller.js";
 import postoController from "./controllers/posto-controller.js";
+import receitaController from "./controllers/receita-controller.js";
 
 // Config kafka
 const kafka = new Kafka({
@@ -29,6 +30,7 @@ async function run() {
       const operation = JSON.parse(message.value).operation;
       console.log(data, operation);
       switch (operation) {
+        //Remedios
         case "CRIAR_REMEDIO":
           await medicamentoController.post(data, producer);
           break;
@@ -38,17 +40,27 @@ async function run() {
         case "GET_REMEDIO_ALL":
           await medicamentoController.getAll(data, producer);
           break;
+        //Medicos
         case "CRIAR_MEDICO":
           await medicoController.post(data, producer);
           break;
+        case "GET_ALL_MEDICO":
+          await medicoController.getAll(data, producer);
+          break;
+        // Farmaceutico
         case "CRIAR_FARMACEUTICO":
           await farmaceuticoController.post(data, producer);
           break;
+        // Posto
         case "CRIAR_POSTO":
           await postoController.post(data, producer);
           break;
         case "GET_POSTO_NOME":
           await postoController.getByNome(data, producer);
+          break;
+        // Receita
+        case "CRIAR_RECEITA":
+          await receitaController.post(data, producer);
           break;
       }
     },

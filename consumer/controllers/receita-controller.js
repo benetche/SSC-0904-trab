@@ -1,22 +1,49 @@
 import mongoose from "mongoose";
 import Receita from "../../database/models/receita.js";
+import Paciente from "../../database/models/paciente.js";
+import Medico from "../../database/models/medico.js";
+import Medicamento from "../../database/models/medicamento.js";
+import generateUniqueId from "../../producer/utils/correlationId.js";
+
 const receitaController = {
   // Cria uma nova receita
-  post: async (req, res) => {
+  post: async (data, producer) => {
     try {
-      const dados = req.body;
-
-      const receita = new Receita(dados);
+      const { paciente, receituario, medico, validade } = data;
+      // const receita = new Receita(dados);
+      const { medicamento, frequencia, dose } = receituario;
+      const pacienteCheck = await Paciente.findOne({ cpf: paciente });
+      const medicoCheck = await Medico.findOne({ cpf: medico });
+      const medicamentoCheck = await Medicamento.findOne({
+        codigo: medicamento,
+      });
+      const receita = new Receita({
+        cod_receita: generateUniqueId(),
+        paciente: pacienteCheck._id,
+        receituario: {
+          medicamento: medicamentoCheck._id,
+          dose: dose,
+          frequencia: frequencia,
+        },
+        medico: medicoCheck._id,
+        validade: validade,
+      });
 
       await receita.save();
-      res.status(201).send({
-        message: "Receita cadastrada com sucesso",
+      const message = {
+        data: receita,
+        method: `receitaCreate`,
+      };
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: JSON.stringify(message),
+          },
+        ],
       });
     } catch (error) {
-      res.status(500).send({
-        message: "Falha ao processar requisição post",
-        error: error.message,
-      });
+      console.error(error);
     }
   },
 
