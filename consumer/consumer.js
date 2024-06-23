@@ -43,8 +43,13 @@ async function run() {
           break;
         case "CRIAR_FARMACEUTICO":
           await farmaceuticoController.post(data, producer);
+          break;
         case "CRIAR_POSTO":
           await postoController.post(data, producer);
+          break;
+        case "GET_POSTO_NOME":
+          await postoController.getByNome(data, producer);
+          break;
       }
     },
   });

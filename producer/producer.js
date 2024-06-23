@@ -79,25 +79,26 @@ async function run() {
     eachMessage: async ({ topic, partition, message }) => {
       const { data, method } = JSON.parse(message.value.toString());
       console.log("Resposta", method);
-      let key;
-      switch (method.toString()) {
-        case "medicamentoGetByCodigo":
-          key = `${method}:${data.codigo}`;
-          break;
-        case "medicamentoGetAll":
-          console.log("entrou");
-          key = `medicamento:getAll`;
-          console.log(key);
-          break;
-        default:
-          key = `medico:create`;
-          break;
-      }
-      const res = responses[key];
-      if (res) {
-        res.write(`data: ${JSON.stringify({ method, data })}\n\n`);
-        delete responses[key];
-      }
+      // let key;
+      // switch (method.toString()) {
+      //   case "medicamentoGetByCodigo":
+      //     key = `${method}:${data.codigo}`;
+      //     break;
+      //   case "medicamentoGetAll":
+      //     console.log("entrou");
+      //     key = `medicamento:getAll`;
+      //     console.log(key);
+      //     break;
+
+      //   default:
+      //     key = `medico:create`;
+      //     break;
+      // }
+      // const res = responses[key];
+      // if (res) {
+      //   res.write(`data: ${JSON.stringify({ method, data })}\n\n`);
+      //   delete responses[key];
+      // }
     },
   });
 
