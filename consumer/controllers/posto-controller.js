@@ -1,22 +1,43 @@
+import Farmaceutico from "../../database/models/farmaceutico.js";
+import Medicamento from "../../database/models/medicamento.js";
+import Medico from "../../database/models/medico.js";
 import Posto from "../../database/models/posto.js";
 
 const postoController = {
   // Cria um novo posto
-  post: async (req, res) => {
+  post: async (data, producer) => {
     try {
-      const dados = req.body;
-      const posto = new Posto(dados);
+      const { nome, farmaceuticos, medicos, estoque } = data;
+      const farmaceutico = await Farmaceutico.findOne({ cpf: farmaceuticos });
+      const medico = await Medico.findOne({ cpf: medicos });
+      const medicamento = await Medicamento.findOne({
+        codigo: estoque.medicamento,
+      });
+      const quant = estoque.quantidade;
+      const posto = new Posto({
+        nome,
+        farmaceuticos: farmaceutico._id,
+        medicos: medico._id,
+        estoque: {
+          medicamentos: medicamento._id,
+          quantidade: quant,
+        },
+      });
       await posto.save();
-      res.status(201).json({
-        message: "Posto cadastrado com sucesso!",
-        posto,
+      const message = {
+        data: posto,
+        method: `postoCreate`,
+      };
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: JSON.stringify(message),
+          },
+        ],
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({
-        message: "Falha ao processar requisição",
-        error: error.message,
-      });
     }
   },
 

@@ -1,6 +1,9 @@
 import { Kafka } from "kafkajs";
 import { connectDB } from "../database/connect.js";
 import medicamentoController from "./controllers/medicamento-controller.js";
+import medicoController from "./controllers/medico-controller.js";
+import farmaceuticoController from "./controllers/farmaceutico-controller.js";
+import postoController from "./controllers/posto-controller.js";
 
 // Config kafka
 const kafka = new Kafka({
@@ -35,6 +38,13 @@ async function run() {
         case "GET_REMEDIO_ALL":
           await medicamentoController.getAll(data, producer);
           break;
+        case "CRIAR_MEDICO":
+          await medicoController.post(data, producer);
+          break;
+        case "CRIAR_FARMACEUTICO":
+          await farmaceuticoController.post(data, producer);
+        case "CRIAR_POSTO":
+          await postoController.post(data, producer);
       }
     },
   });

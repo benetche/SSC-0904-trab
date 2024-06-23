@@ -17,11 +17,6 @@ const pacienteSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
-  convenioMedico: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Convenio",
-    required: false,
-  },
   idade: {
     type: Number,
     required: true,

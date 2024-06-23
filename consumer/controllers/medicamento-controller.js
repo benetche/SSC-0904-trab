@@ -7,11 +7,15 @@ const medicamentoController = {
       const dados = data;
       const medicamento = new Medicamento(dados);
       await medicamento.save();
+      const message = {
+        data: medicamento,
+        method: `medicamentoCreate`,
+      };
       await producer.send({
         topic: "responses",
         messages: [
           {
-            value: `Medicamento ${dados} criado`,
+            value: JSON.stringify(message),
           },
         ],
       });

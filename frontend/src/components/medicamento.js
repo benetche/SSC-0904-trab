@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const Medicamento = () => {
+const MedicamentoPage = () => {
   const [medicamento, setMedicamento] = useState(null);
   const [codigo, setCodigo] = useState("");
 
@@ -68,4 +68,4 @@ const Medicamento = () => {
   );
 };
 
-export default Medicamento;
+export default MedicamentoPage;

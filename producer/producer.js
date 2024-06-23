@@ -2,6 +2,9 @@ import express from "express";
 import { Kafka, logLevel } from "kafkajs";
 import cors from "cors";
 import medicamentoRoutes from "./routes/medicamentoRoutes.js";
+import medicoRoutes from "./routes/medicoRoutes.js";
+import farmaceuticoRoutes from "./routes/farmaceuticoRoutes.js";
+import postoRoutes from "./routes/postoRoutes.js";
 
 const app = express();
 
@@ -36,6 +39,9 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(cors());
 app.use("/api/medicamento", medicamentoRoutes);
+app.use("/api/medico", medicoRoutes);
+app.use("/api/farmaceutico", farmaceuticoRoutes);
+app.use("/api/posto", postoRoutes);
 
 const responses = {};
 
@@ -82,6 +88,9 @@ async function run() {
           console.log("entrou");
           key = `medicamento:getAll`;
           console.log(key);
+          break;
+        default:
+          key = `medico:create`;
           break;
       }
       const res = responses[key];

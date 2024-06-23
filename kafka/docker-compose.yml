@@ -4,6 +4,7 @@ services:
     image: wurstmeister/zookeeper:latest
     ports:
       - "2181:2181"
+
   kafka:
     image: wurstmeister/kafka:2.11-1.1.0
     ports:
@@ -14,3 +15,20 @@ services:
       KAFKA_CREATE_TOPICS: "requests:1:1,responses:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  kafka-init:
+    image: wurstmeister/kafka:2.11-1.1.0
+    depends_on:
+      - kafka
+    entrypoint: >
+      /bin/bash -c "
+        # Aguardar Kafka iniciar
+        while ! nc -z kafka 9092; do
+          sleep 1;
+        done;
+        # Deletar e recriar tópicos
+        /opt/kafka/bin/kafka-topics.sh --delete --topic requests --zookeeper zookeeper:2181;
+        /opt/kafka/bin/kafka-topics.sh --delete --topic responses --zookeeper zookeeper:2181;
+        /opt/kafka/bin/kafka-topics.sh --create --topic requests --partitions 1 --replication-factor 1 --zookeeper zookeeper:2181;
+        /opt/kafka/bin/kafka-topics.sh --create --topic responses --partitions 1 --replication-factor 1 --zookeeper zookeeper:2181;
+      "
