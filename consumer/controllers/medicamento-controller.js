@@ -22,14 +22,23 @@ const medicamentoController = {
 
   // Retorna todos os medicamentos
   getAll: async (data, producer) => {
+    console.log("requisição getall");
     try {
       const medicamentos = await Medicamento.find({});
-      res.status(200).json(medicamentos);
-    } catch (error) {
-      res.status(500).json({
-        message: "Falha ao processar requisição",
-        error: error.message,
+      const message = {
+        data: medicamentos,
+        method: `medicamentoGetAll`,
+      };
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: JSON.stringify(message),
+          },
+        ],
       });
+    } catch (error) {
+      console.error({ message: "Erro em medicamentGetAll" });
     }
   },
 
@@ -43,7 +52,8 @@ const medicamentoController = {
         console.log("Medicamento não encontrado");
       } else {
         const message = {
-          medicamento: medicamento,
+          data: medicamento,
+          method: `medicamentoGetByCodigo`,
         };
         await producer.send({
           topic: "responses",
@@ -55,54 +65,7 @@ const medicamentoController = {
         });
       }
     } catch (error) {
-      console.error({ message: "Erro em getByCodigo" });
-    }
-  },
-
-  // Atualiza um medicamento pelo código
-  put: async (req, res) => {
-    try {
-      const medicamento = await Medicamento.findOneAndUpdate(
-        { codigo: req.params.codigo },
-        { $set: req.body },
-        { new: true }
-      );
-      if (!medicamento) {
-        return res.status(404).json({
-          message: "Medicamento não encontrado",
-        });
-      }
-      res.status(200).json({
-        message: "Medicamento atualizado com sucesso",
-        medicamento,
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: "Falha ao processar requisição updateByCodigo",
-        error: error.message,
-      });
-    }
-  },
-
-  // Exclui um medicamento pelo código
-  delete: async (req, res) => {
-    try {
-      const medicamento = await Medicamento.findOneAndDelete({
-        codigo: req.params.codigo,
-      });
-      if (!medicamento) {
-        return res.status(404).json({
-          message: "Medicamento não encontrado",
-        });
-      }
-      res.status(200).json({
-        message: "Medicamento removido com sucesso!",
-      });
-    } catch (error) {
-      res.status(500).json({
-        message: "Falha ao remover medicamento",
-        error: error.message,
-      });
+      console.error({ message: "Erro em medicamentoGetByCodigo" });
     }
   },
 };

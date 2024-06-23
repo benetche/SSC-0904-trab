@@ -1,6 +1,6 @@
 import express from "express";
 import { Kafka, logLevel } from "kafkajs";
-
+import cors from "cors";
 import medicamentoRoutes from "./routes/medicamentoRoutes.js";
 
 const app = express();
@@ -34,7 +34,34 @@ app.use((req, res, next) => {
  * Cadastra as rotas da aplicação
  */
 app.use(express.json());
+app.use(cors());
 app.use("/api/medicamento", medicamentoRoutes);
+
+const responses = {};
+
+app.get("/subscribe/medicamento/get/:codigo", (req, res) => {
+  const codigo = req.params.codigo;
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  responses[`medicamentoGetByCodigo:${codigo}`] = res;
+});
+
+app.get("/subscribe/:type/:id?", (req, res) => {
+  const { type, id } = req.params;
+  const key = id ? `${type}:${id}` : type;
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+  console.log("key:", key);
+  responses[key] = res;
+  res.on("close", () => {
+    delete responses[key];
+  });
+});
 
 async function run() {
   await producer.connect();
@@ -44,7 +71,24 @@ async function run() {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      console.log("Resposta", String(message.value));
+      const { data, method } = JSON.parse(message.value.toString());
+      console.log("Resposta", method);
+      let key;
+      switch (method.toString()) {
+        case "medicamentoGetByCodigo":
+          key = `${method}:${data.codigo}`;
+          break;
+        case "medicamentoGetAll":
+          console.log("entrou");
+          key = `medicamento:getAll`;
+          console.log(key);
+          break;
+      }
+      const res = responses[key];
+      if (res) {
+        res.write(`data: ${JSON.stringify({ method, data })}\n\n`);
+        delete responses[key];
+      }
     },
   });
 
