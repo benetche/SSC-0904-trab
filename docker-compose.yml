@@ -44,7 +44,7 @@ services:
       - ./frontend:/app
     command: yarn start
     ports:
-      - "3000:3000"
+      - "5018:3000"
     networks:
       - my_network
 
@@ -71,7 +71,7 @@ services:
     depends_on:
       - kafka
     ports:
-      - "3333:3333"
+      - "6018:3333"
     networks:
       - my_network
 
