@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Consulta from "../../database/models/consulta.js";
+import Consulta from "../database/models/consulta.js";
 
 const consultaController = {
   post: async (req, res) => {

@@ -1,4 +1,4 @@
-import Convenio from "../../database/models/convenio.js";
+import Convenio from "../database/models/convenio.js";
 
 class ConvenioController {
   async create(req, res) {

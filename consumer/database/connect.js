@@ -10,7 +10,7 @@ import "./models/posto.js";
 import "./models/receita.js";
 const DB_USER = "admin";
 const DB_PASSWORD = "admin";
-const DB_HOST = "localhost";
+const DB_HOST = "db";
 const DB_PORT = "27017";
 const DB_NAME = "db";
 const URI = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`;

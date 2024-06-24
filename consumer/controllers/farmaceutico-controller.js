@@ -1,4 +1,4 @@
-import Farmaceutico from "../../database/models/farmaceutico.js";
+import Farmaceutico from "../database/models/farmaceutico.js";
 
 const farmaceuticoController = {
   // Cria um novo farmacêutico

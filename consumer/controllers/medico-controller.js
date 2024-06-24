@@ -1,4 +1,4 @@
-import Medico from "../../database/models/medico.js";
+import Medico from "../database/models/medico.js";
 
 const medicoController = {
   // Cria um novo médico

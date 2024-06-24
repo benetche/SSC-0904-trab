@@ -1,7 +1,7 @@
-import Farmaceutico from "../../database/models/farmaceutico.js";
-import Medicamento from "../../database/models/medicamento.js";
-import Medico from "../../database/models/medico.js";
-import Posto from "../../database/models/posto.js";
+import Farmaceutico from "../database/models/farmaceutico.js";
+import Medicamento from "../database/models/medicamento.js";
+import Medico from "../database/models/medico.js";
+import Posto from "../database/models/posto.js";
 
 const postoController = {
   // Cria um novo posto

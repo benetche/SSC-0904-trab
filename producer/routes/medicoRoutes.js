@@ -1,6 +1,5 @@
 import express from "express";
 import { CompressionTypes } from "kafkajs";
-import generateUniqueId from "../utils/correlationId.js";
 const medicoRoutes = express.Router();
 
 medicoRoutes.post("/criar", async (req, res) => {

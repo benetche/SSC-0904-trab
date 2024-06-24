@@ -1,5 +1,5 @@
 import { Kafka } from "kafkajs";
-import { connectDB } from "../database/connect.js";
+import { connectDB } from "./database/connect.js";
 import medicamentoController from "./controllers/medicamento-controller.js";
 import medicoController from "./controllers/medico-controller.js";
 import farmaceuticoController from "./controllers/farmaceutico-controller.js";

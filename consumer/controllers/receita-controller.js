@@ -1,9 +1,15 @@
 import mongoose from "mongoose";
-import Receita from "../../database/models/receita.js";
-import Paciente from "../../database/models/paciente.js";
-import Medico from "../../database/models/medico.js";
-import Medicamento from "../../database/models/medicamento.js";
-import generateUniqueId from "../../producer/utils/correlationId.js";
+import Receita from "../database/models/receita.js";
+import Paciente from "../database/models/paciente.js";
+import Medico from "../database/models/medico.js";
+import Medicamento from "../database/models/medicamento.js";
+
+function generateUniqueId() {
+  const timestamp = new Date().getTime(); // Obtém o timestamp atual em milissegundos
+  const randomNum = Math.floor(Math.random() * 1000); // Gera um número aleatório entre 0 e 999
+
+  return `${timestamp}_${randomNum}`;
+}
 
 const receitaController = {
   // Cria uma nova receita

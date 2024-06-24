@@ -14,7 +14,7 @@ const app = express();
  */
 const kafka = new Kafka({
   clientId: "api",
-  brokers: ["localhost:9092"],
+  brokers: ["kafka:9092"],
   logLevel: logLevel.WARN,
   retry: {
     initialRetryTime: 300,

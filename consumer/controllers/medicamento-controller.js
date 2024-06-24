@@ -1,4 +1,4 @@
-import Medicamento from "../../database/models/medicamento.js";
+import Medicamento from "../database/models/medicamento.js";
 
 const medicamentoController = {
   // Cria um novo medicamento
