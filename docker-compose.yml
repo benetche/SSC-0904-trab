@@ -42,7 +42,7 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app
-    command: "yarn start"
+    command: yarn start
     ports:
       - "3000:3000"
     networks:
@@ -72,6 +72,24 @@ services:
       - kafka
     ports:
       - "3333:3333"
+    networks:
+      - my_network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - my_network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3002:3000"
     networks:
       - my_network
 

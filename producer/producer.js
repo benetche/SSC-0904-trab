@@ -6,6 +6,7 @@ import medicoRoutes from "./routes/medicoRoutes.js";
 import farmaceuticoRoutes from "./routes/farmaceuticoRoutes.js";
 import postoRoutes from "./routes/postoRoutes.js";
 import receitaRoutes from "./routes/receitaRoutes.js";
+import promClient from 'prom-client'
 
 const app = express();
 
@@ -25,10 +26,38 @@ const kafka = new Kafka({
 const producer = kafka.producer();
 const consumer = kafka.consumer({ groupId: "request-group-receiver" });
 
+const collectDefaultMetrics = promClient.collectDefaultMetrics;
+const Registry = promClient.Registry;
+const register = new Registry();
+
+// Probe every 5th second.
+collectDefaultMetrics({ register, timeout: 5000 });
+
+// Create a custom counter metric for request operations
+const requestCounter = new promClient.Counter({
+  name: 'node_request_operations_total',
+  help: 'Total number of requests',
+  labelNames: ['method', 'route', 'code'],
+});
+
+// Register the custom metric
+register.registerMetric(requestCounter);
+
+// Endpoint to expose metrics
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', register.contentType);
+  res.end(await register.metrics());
+});
+
+// Register the custom metric
+register.registerMetric(requestCounter);
 /**
  * Disponibiliza o producer para todas rotas
  */
 app.use((req, res, next) => {
+  res.on('finish', () => {
+    requestCounter.inc({ method: req.method, route: req.route ? req.route.path : req.path, code: res.statusCode });
+  });
   req.producer = producer;
   // req.consumer = consumer;
   return next();
