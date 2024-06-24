@@ -60,7 +60,7 @@ function PainelMedico() {
     medication.substancia.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const handleSubmit = async (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     const { cpfPaciente, codigoMedicamento, dose, frequencia, medico } =
       receita;
 
