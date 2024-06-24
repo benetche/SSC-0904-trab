@@ -14,14 +14,14 @@ function PainelMedico() {
   });
 
   const [medicos, setMedicos] = useState([{ nome: "Joao", cpf: "123456" }]);
-
+  const path = "http://localhost:6018";
   useEffect(() => {
     const method = "getAll";
-    fetch(`http://localhost:3333/api/medicamento/getAll`, {
+    fetch(`${path}/api/medicamento/getAll`, {
       method: "GET",
     });
     const kafkaConsumer = new EventSource(
-      `http://localhost:3333/subscribe/medicamento/${method}`
+      `${path}/subscribe/medicamento/${method}`
     );
 
     kafkaConsumer.onmessage = (event) => {
@@ -34,12 +34,10 @@ function PainelMedico() {
 
   useEffect(() => {
     const method = "getAll";
-    fetch(`http://localhost:3333/api/medico/getAll`, {
+    fetch(`${path}/api/medico/getAll`, {
       method: "GET",
     });
-    const kafkaConsumer = new EventSource(
-      `http://localhost:3333/subscribe/medico/${method}`
-    );
+    const kafkaConsumer = new EventSource(`${path}/subscribe/medico/${method}`);
 
     kafkaConsumer.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -78,10 +76,7 @@ function PainelMedico() {
     // console.log(JSON.stringify(newReceita));
     // await axios.post("localhost:3333/api/receita/criar", newReceita);
     try {
-      const response = await axios.post(
-        "http://localhost:3333/api/receita/criar",
-        newReceita
-      );
+      const response = await axios.post(`${path}/api/receita/cria`, newReceita);
       console.log("Resposta da API:", response.data);
     } catch (error) {
       console.error("Erro ao criar a receita:", error);
