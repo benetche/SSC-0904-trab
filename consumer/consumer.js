@@ -5,6 +5,8 @@ import medicoController from "./controllers/medico-controller.js";
 import farmaceuticoController from "./controllers/farmaceutico-controller.js";
 import postoController from "./controllers/posto-controller.js";
 import receitaController from "./controllers/receita-controller.js";
+import promClient from 'prom-client'
+
 
 // Config kafka
 const kafka = new Kafka({
