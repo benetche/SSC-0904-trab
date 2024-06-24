@@ -30,18 +30,24 @@ const collectDefaultMetrics = promClient.collectDefaultMetrics;
 const Registry = promClient.Registry;
 const register = new Registry();
 
-// Probe every 5th second.
 collectDefaultMetrics({ register, timeout: 5000 });
 
-// Create a custom counter metric for request operations
+// Create custom metrics
 const requestCounter = new promClient.Counter({
   name: 'node_request_operations_total',
   help: 'Total number of requests',
   labelNames: ['method', 'route', 'code'],
 });
 
-// Register the custom metric
+const httpRequestDurationMicroseconds = new promClient.Histogram({
+  name: 'http_request_duration_ms',
+  help: 'Duration of HTTP requests in ms',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.1, 5, 15, 50, 100, 300, 500, 1000, 3000, 5000, 10000] // 0.1ms to 10s
+});
+
 register.registerMetric(requestCounter);
+register.registerMetric(httpRequestDurationMicroseconds);
 
 // Endpoint to expose metrics
 app.get('/metrics', async (req, res) => {
@@ -49,14 +55,12 @@ app.get('/metrics', async (req, res) => {
   res.end(await register.metrics());
 });
 
-// Register the custom metric
-register.registerMetric(requestCounter);
-/**
- * Disponibiliza o producer para todas rotas
- */
+
 app.use((req, res, next) => {
+  const end = httpRequestDurationMicroseconds.startTimer();
   res.on('finish', () => {
     requestCounter.inc({ method: req.method, route: req.route ? req.route.path : req.path, code: res.statusCode });
+    end({ method: req.method, route: req.route ? req.route.path : req.path, code: res.statusCode });
   });
   req.producer = producer;
   // req.consumer = consumer;
