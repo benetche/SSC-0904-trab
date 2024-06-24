@@ -6,7 +6,7 @@ import medicoRoutes from "./routes/medicoRoutes.js";
 import farmaceuticoRoutes from "./routes/farmaceuticoRoutes.js";
 import postoRoutes from "./routes/postoRoutes.js";
 import receitaRoutes from "./routes/receitaRoutes.js";
-import promClient from 'prom-client'
+import promClient from "prom-client";
 
 const app = express();
 
@@ -34,33 +34,40 @@ collectDefaultMetrics({ register, timeout: 5000 });
 
 // Create custom metrics
 const requestCounter = new promClient.Counter({
-  name: 'node_request_operations_total',
-  help: 'Total number of requests',
-  labelNames: ['method', 'route', 'code'],
+  name: "node_request_operations_total",
+  help: "Total number of requests",
+  labelNames: ["method", "route", "code"],
 });
 
 const httpRequestDurationMicroseconds = new promClient.Histogram({
-  name: 'http_request_duration_ms',
-  help: 'Duration of HTTP requests in ms',
-  labelNames: ['method', 'route', 'code'],
-  buckets: [0.1, 5, 15, 50, 100, 300, 500, 1000, 3000, 5000, 10000] // 0.1ms to 10s
+  name: "http_request_duration_ms",
+  help: "Duration of HTTP requests in ms",
+  labelNames: ["method", "route", "code"],
+  buckets: [0.1, 5, 15, 50, 100, 300, 500, 1000, 3000, 5000, 10000], // 0.1ms to 10s
 });
 
 register.registerMetric(requestCounter);
 register.registerMetric(httpRequestDurationMicroseconds);
 
 // Endpoint to expose metrics
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", register.contentType);
   res.end(await register.metrics());
 });
 
-
 app.use((req, res, next) => {
   const end = httpRequestDurationMicroseconds.startTimer();
-  res.on('finish', () => {
-    requestCounter.inc({ method: req.method, route: req.route ? req.route.path : req.path, code: res.statusCode });
-    end({ method: req.method, route: req.route ? req.route.path : req.path, code: res.statusCode });
+  res.on("finish", () => {
+    requestCounter.inc({
+      method: req.method,
+      route: req.route ? req.route.path : req.path,
+      code: res.statusCode,
+    });
+    end({
+      method: req.method,
+      route: req.route ? req.route.path : req.path,
+      code: res.statusCode,
+    });
   });
   req.producer = producer;
   // req.consumer = consumer;
@@ -97,6 +104,8 @@ app.get("/subscribe/:type/:id?", (req, res) => {
   res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
+  console.log("KEY =", key);
+
   responses[key] = res;
   res.on("close", () => {
     delete responses[key];
@@ -126,6 +135,9 @@ async function run() {
           break;
         case "receitaCreate":
           key = `receita:create`;
+          break;
+        case "receitaGetAll":
+          key = `receita:getAll`;
           break;
         default:
           key = `medico:create`;

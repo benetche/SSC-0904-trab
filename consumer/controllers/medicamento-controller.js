@@ -26,7 +26,6 @@ const medicamentoController = {
 
   // Retorna todos os medicamentos
   getAll: async (data, producer) => {
-    console.log("requisição getall");
     try {
       const medicamentos = await Medicamento.find({});
       const message = {

@@ -20,6 +20,9 @@ def gerar_paciente():
 numero_de_pacientes = 10  # Defina o número de pacientes a serem gerados
 
 pacientes = [gerar_paciente() for _ in range(numero_de_pacientes)]
+pacientes.append({'cpf': "390.494.958-69", 'nome': fake.name(),
+        'endereco': fake.address(),
+        'idade': random.randint(0, 65) })
 collection.insert_many(pacientes)
 
 collection = db['medicos']

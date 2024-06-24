@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 function PainelMedico() {
-  const [medicamentos, setMedicamentos] = useState([
-    { substancia: "Paracetamol", codigo: "001" },
-  ]);
+  const [medicamentos, setMedicamentos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [receita, setReceita] = useState({
     cpfPaciente: "",
@@ -12,6 +10,7 @@ function PainelMedico() {
     frequencia: "",
     medico: "",
   });
+  const [allReceitas, setAllReceitas] = useState([]);
 
   const [medicos, setMedicos] = useState([{ nome: "Joao", cpf: "123456" }]);
   const path = "http://localhost:6018";
@@ -46,6 +45,23 @@ function PainelMedico() {
     };
   }, []);
 
+  useEffect(() => {
+    const method = "getAll";
+    fetch(`${path}/api/receita/getAll`, {
+      method: "GET",
+    });
+    const kafkaConsumer = new EventSource(
+      `${path}/subscribe/receita/${method}`
+    );
+
+    kafkaConsumer.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data.data);
+      setAllReceitas(data.data);
+      kafkaConsumer.close();
+    };
+  }, []);
+
   const handleChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -58,7 +74,7 @@ function PainelMedico() {
     medication.substancia.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const { cpfPaciente, codigoMedicamento, dose, frequencia, medico } =
       receita;
 
@@ -73,10 +89,11 @@ function PainelMedico() {
       validade: "30 dias",
     };
 
-    // console.log(JSON.stringify(newReceita));
-    // await axios.post("localhost:3333/api/receita/criar", newReceita);
     try {
-      const response = await axios.post(`${path}/api/receita/cria`, newReceita);
+      const response = await axios.post(
+        `${path}/api/receita/criar`,
+        newReceita
+      );
       console.log("Resposta da API:", response.data);
     } catch (error) {
       console.error("Erro ao criar a receita:", error);
@@ -94,13 +111,15 @@ function PainelMedico() {
           onChange={handleChange}
           className="w-full px-4 py-2 mb-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <ul>
-          {filteredMedications.map((med) => (
-            <li key={med.codigo} className="mb-2">
-              {med.substancia} ({med.codigo})
-            </li>
-          ))}
-        </ul>
+        {medicamentos.length > 0 && (
+          <ul>
+            {filteredMedications.map((med) => (
+              <li key={med.codigo} className="mb-2">
+                {med.substancia} ({med.codigo})
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className="w-1/2 p-4 bg-green-100 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-4">Receita Médica</h2>
@@ -189,6 +208,22 @@ function PainelMedico() {
             Criar Receita
           </button>
         </form>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Todas as receitas:
+          </label>
+          <ul>
+            {allReceitas.length > 0 &&
+              allReceitas.map((receita) => (
+                <li className="mb-2 bg-green-200">
+                  COD: {receita.cod_receita}, PACIENTE: {receita.paciente.nome},
+                  MEDICO: {receita.medico.nome}, PRESCRIÇÃO:
+                  {receita.receituario.medicamento.substancia},{" "}
+                  {receita.receituario.dose}, {receita.receituario.frequencia}
+                </li>
+              ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

@@ -5,8 +5,7 @@ import medicoController from "./controllers/medico-controller.js";
 import farmaceuticoController from "./controllers/farmaceutico-controller.js";
 import postoController from "./controllers/posto-controller.js";
 import receitaController from "./controllers/receita-controller.js";
-import promClient from 'prom-client'
-
+import promClient from "prom-client";
 
 // Config kafka
 const kafka = new Kafka({
@@ -63,6 +62,9 @@ async function run() {
         // Receita
         case "CRIAR_RECEITA":
           await receitaController.post(data, producer);
+          break;
+        case "GET_RECEITA_ALL":
+          await receitaController.getAll(data, producer);
           break;
       }
     },
