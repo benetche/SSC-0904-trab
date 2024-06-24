@@ -8,7 +8,7 @@ import receitaController from "./controllers/receita-controller.js";
 
 // Config kafka
 const kafka = new Kafka({
-  brokers: ["localhost:9092"],
+  brokers: ["kafka:9092"],
   clientId: "consumer-database",
 });
 const topic = "requests";

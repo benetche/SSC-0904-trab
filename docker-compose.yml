@@ -10,12 +10,16 @@ services:
       MONGO_INITDB_DATABASE: g8-mongo
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
+    networks:
+      - my_network
 
   zookeeper:
     restart: always
     image: wurstmeister/zookeeper:latest
     ports:
       - "2181:2181"
+    networks:
+      - my_network
 
   kafka:
     restart: always
@@ -23,28 +27,15 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "requests:1:1,responses:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - my_network
 
-  # kafka-init:
-  #   image: wurstmeister/kafka:2.11-1.1.0
-  #   depends_on:
-  #     - kafka
-  #   entrypoint: >
-  #     /bin/bash -c "
-  #       # Aguardar Kafka iniciar
-  #       while ! nc -z kafka 9092; do
-  #         sleep 1;
-  #       done;
-  #       # Deletar e recriar tópicos
-  #       /opt/kafka/bin/kafka-topics.sh --delete --topic requests --zookeeper zookeeper:2181;
-  #       /opt/kafka/bin/kafka-topics.sh --delete --topic responses --zookeeper zookeeper:2181;
-  #       /opt/kafka/bin/kafka-topics.sh --create --topic requests --partitions 1 --replication-factor 1 --zookeeper zookeeper:2181;
-  #       /opt/kafka/bin/kafka-topics.sh --create --topic responses --partitions 1 --replication-factor 1 --zookeeper zookeeper:2181;
-  #     "
   react-app:
     image: node:latest
     working_dir: /app
@@ -54,6 +45,8 @@ services:
       "yarn start"
     ports:
       - "3000:3000"
+    networks:
+      - my_network
 
   node-consumer:
     image: node:latest
@@ -64,6 +57,8 @@ services:
     depends_on:
       - kafka
       - db
+    networks:
+      - my_network
 
   node-producer:
     image: node:latest
@@ -75,3 +70,9 @@ services:
       - kafka
     ports:
       - "3333:3333"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
