@@ -12,10 +12,8 @@
 Para acessar a VM do Cluster ICMC, rodar:
 
 ```linux
-ssh -L 5018:localhost:5018 -L 6018:localhost:6018 -L 7018:localhost:7018 gsdgrad08@andromeda.lasdpc.icmc.usp.br -p 2118
+ssh -L gsdgrad08@andromeda.lasdpc.icmc.usp.br -p 2118
 ```
-
-Será necessário inserir a senha de autenticação. Após isso, além de estar conectado a VM, as portas 5018, 6018, 7018 de sua máquina pessoal estarão mapeadas para as portas do cluster.
 
 ## Iniciando a aplicação
 
@@ -88,7 +86,7 @@ Se tudo estiver de acordo, agora tudo o que é necessário está rodando.
 
 ## Acessando o Frontend
 
-Para acessar o frontend da aplicação, basta entrar em algum navegador (recomendado é o Google Chrome) e acessar o endereço "localhost:5018".
+Para acessar o frontend da aplicação, basta entrar em algum navegador (recomendado é o Google Chrome) e acessar o endereço "http://andromeda.lasdpc.icmc.usp.br::5018".
 
 Agora, você poderá ter acesso ao frontend, porém não há dados inseridos no Database MongoDB **ainda**.
 
@@ -137,4 +135,8 @@ python3 generate_db.py
 
 ## Voltando ao Frontend
 
-Agora, basta recarregar a página "localhost:5018/medico" para visualizar os dados do banco de dados.
+Agora, basta recarregar a página "http://andromeda.lasdpc.icmc.usp.br:5018/medico" para visualizar os dados do banco de dados.
+
+## Grafana e Prometheus
+
+O grafana poderá ser acessado com a página "http://andromeda.lasdpc.icmc.usp.br:8018". As configurções utilizadas para o Grafana e o Proemetheus estão descritas no relatório do projeto.
