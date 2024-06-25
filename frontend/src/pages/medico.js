@@ -13,7 +13,7 @@ function PainelMedico() {
   const [allReceitas, setAllReceitas] = useState([]);
 
   const [medicos, setMedicos] = useState([{ nome: "Joao", cpf: "123456" }]);
-  const path = "http://localhost:6018";
+  const path = "http://andromeda.lasdpc.icmc.usp.br:6018";
   useEffect(() => {
     const method = "getAll";
     fetch(`${path}/api/medicamento/getAll`, {
