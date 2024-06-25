@@ -75,13 +75,13 @@ services:
     networks:
       - my_network
 
-  prometheus:
+    prometheus:
     image: prom/prometheus
     container_name: prometheus
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
-      - "9090:9090"
+      - "7018:9090"  # Alteração da porta de 9090 para 7018
     networks:
       - my_network
 
@@ -89,7 +89,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "3002:3000"
+      - "8018:3000"  # Alteração da porta de 3002 para 8018
     networks:
       - my_network
 
