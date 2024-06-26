@@ -55,6 +55,7 @@ const medicamentoController = {
         console.log("Medicamento não encontrado");
       } else {
         const message = {
+          query: data,
           data: medicamento,
           method: `medicamentoGetByCodigo`,
         };

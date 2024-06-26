@@ -16,7 +16,6 @@ const receitaController = {
   post: async (data, producer) => {
     try {
       const { paciente, receituario, medico, validade } = data;
-      // const receita = new Receita(dados);
       const { medicamento, frequencia, dose } = receituario;
       const pacienteCheck = await Paciente.findOne({ cpf: paciente });
       const medicoCheck = await Medico.findOne({ cpf: medico });
@@ -59,7 +58,6 @@ const receitaController = {
         .populate("medico")
         .populate("paciente")
         .populate("receituario.medicamento");
-      console.log("RECEITA ENCONTRADA: ", receita);
       const message = {
         data: receita,
         method: `receitaGetAll`,

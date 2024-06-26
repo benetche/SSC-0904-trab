@@ -42,21 +42,21 @@ const postoController = {
   },
 
   // Retorna um posto pelo nome
-  getByNome: async (data, producer) => {
+  getByCodigo: async (data, producer) => {
     try {
-      const nome = data;
+      const codigo = data;
 
-      const posto = await Posto.findOne({ nome: nome })
+      const posto = await Posto.findOne({ codigo: codigo })
         .populate("farmaceuticos")
         .populate("medicos")
-        .populate("estoque.medicamentos");
-      console.log(posto);
+        .populate("estoque.medicamento");
       if (!posto) {
         return new Error({ message: "Posto não encontrado" });
       }
       const message = {
         data: posto,
-        method: `postoGetByNome`,
+        query: codigo,
+        method: `postoGetByCodigo`,
       };
       await producer.send({
         topic: "responses",
@@ -66,6 +66,60 @@ const postoController = {
           },
         ],
       });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  getPostoFarmaceutico: async (data, producer) => {
+    try {
+      const cpf = data;
+      const farmaceutico = await Farmaceutico.findOne({ cpf });
+
+      if (!farmaceutico) {
+        return console.error({ message: "Farmaceutico não encontrado" });
+      }
+      const posto = await Posto.findOne({
+        farmaceuticos: farmaceutico._id,
+      }).populate("farmaceuticos");
+
+      const message = {
+        data: posto,
+        method: `postoGetFarmaceutico`,
+      };
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: JSON.stringify(message),
+          },
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  updatePostoEstoque: async (data, producer) => {
+    try {
+      const { posto, medicamento, quantidade } = data;
+      console.log(posto, ",", medicamento, ",", quantidade);
+      const postoExists = await Posto.findOne({ codigo: posto }).populate(
+        "estoque.medicamento"
+      );
+      if (!postoExists) {
+        return console.error({ message: "Posto não encontrado" });
+      }
+      const medicamentoIndex = postoExists.estoque.findIndex(
+        (item) => item.medicamento.codigo === medicamento
+      );
+      if (medicamentoIndex === -1) {
+        console.error("Medicamento not found in posto estoque.");
+        return;
+      }
+
+      postoExists.estoque[medicamentoIndex].quantidade = quantidade;
+      await postoExists.save();
     } catch (error) {
       console.error(error);
     }

@@ -7,6 +7,7 @@ import farmaceuticoRoutes from "./routes/farmaceuticoRoutes.js";
 import postoRoutes from "./routes/postoRoutes.js";
 import receitaRoutes from "./routes/receitaRoutes.js";
 import promClient from "prom-client";
+import pacienteRoutes from "./routes/pacienteRoutes.js";
 
 const app = express();
 
@@ -84,21 +85,16 @@ app.use("/api/medico", medicoRoutes);
 app.use("/api/farmaceutico", farmaceuticoRoutes);
 app.use("/api/posto", postoRoutes);
 app.use("/api/receita", receitaRoutes);
+app.use("/api/pacientes", pacienteRoutes);
 const responses = {};
 
-app.get("/subscribe/medicamento/get/:codigo", (req, res) => {
-  const codigo = req.params.codigo;
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders();
+// rotas subscribe
+app.get("/subscribe/:type/:action/:id?", (req, res) => {
+  const { type, action, id } = req.params;
+  const key = id
+    ? `${type}${action.charAt(0).toUpperCase() + action.slice(1)}:${id}`
+    : `${type}${action.charAt(0).toUpperCase() + action.slice(1)}`;
 
-  responses[`medicamentoGetByCodigo:${codigo}`] = res;
-});
-
-app.get("/subscribe/:type/:id?", (req, res) => {
-  const { type, id } = req.params;
-  const key = id ? `${type}:${id}` : type;
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -112,6 +108,16 @@ app.get("/subscribe/:type/:id?", (req, res) => {
   });
 });
 
+const methodKeyMappings = {
+  medicamentoGetByCodigo: (query) => `medicamentoGet:${query}`,
+  medicamentoGetAll: () => "medicamentoGetAll",
+  medicoGetAll: () => "medicoGetAll",
+  receitaCreate: () => "receitaCreate",
+  receitaGetAll: () => "receitaGetAll",
+  postoGetByCodigo: (query) => `postoGetByCodigo:${query}`,
+  pacientesGetAll: () => "pacientesGetAll",
+};
+
 async function run() {
   await producer.connect();
   await consumer.connect();
@@ -120,29 +126,10 @@ async function run() {
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
-      const { data, method } = JSON.parse(message.value.toString());
-      console.log("Resposta", method);
-      let key;
-      switch (method.toString()) {
-        case "medicamentoGetByCodigo":
-          key = `${method}:${data.codigo}`;
-          break;
-        case "medicamentoGetAll":
-          key = `medicamento:getAll`;
-          break;
-        case "medicoGetAll":
-          key = "medico:getAll";
-          break;
-        case "receitaCreate":
-          key = `receita:create`;
-          break;
-        case "receitaGetAll":
-          key = `receita:getAll`;
-          break;
-        default:
-          key = `medico:create`;
-          break;
-      }
+      const { data, method, query } = JSON.parse(message.value.toString());
+      console.log("Resposta", method, " query ", query);
+      const getKey = methodKeyMappings[method] || (() => "medico:create");
+      const key = getKey(query);
       const res = responses[key];
       if (res) {
         res.write(`data: ${JSON.stringify({ method, data })}\n\n`);

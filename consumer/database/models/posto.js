@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const postoSchema = new mongoose.Schema({
+  codigo: {
+    type: String,
+    trim: true,
+    unique: true,
+  },
   nome: {
     type: String,
     trim: true,
@@ -17,16 +22,18 @@ const postoSchema = new mongoose.Schema({
     required: true,
   },
   estoque: {
-    type: {
-      medicamentos: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Medicamento",
+    type: [
+      {
+        medicamento: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Medicamento",
+        },
+        quantidade: {
+          type: Number,
+          required: true,
+        },
       },
-      quantidade: {
-        type: Number,
-        required: true,
-      },
-    },
+    ],
   },
 });
 

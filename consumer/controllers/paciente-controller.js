@@ -1,39 +1,50 @@
 import Paciente from "../database/models/paciente.js";
 import mongoose from "mongoose";
 
-class PacienteController {
-  async create(req, res) {
-    const { cpf, nome, endereco, convenioMedico, idade } = req.body;
+const pacienteController = {
+  post: async (data, producer) => {
+    const { cpf, nome, endereco, idade } = data;
+    const paciente = new Paciente(data);
 
     try {
-      const paciente = await Paciente.create({
-        cpf,
-        nome,
-        endereco,
-        convenioMedico,
-        idade,
+      await paciente.save();
+      const message = {
+        data: paciente,
+        method: `pacienteCreate`,
+      };
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: JSON.stringify(message),
+          },
+        ],
       });
-      return res.json(paciente);
     } catch (error) {
-      return res.status(500).send({
-        error: "Falha ao criar paciente",
-        message: error,
-      });
+      return console.error("Falha ao criar paciente.", error);
     }
-  }
-
-  async getAll(req, res) {
+  },
+  getAll: async (data, producer) => {
     try {
       const pacientes = await Paciente.find({});
 
-      res.status(200).json(pacientes);
-    } catch (error) {
-      res.status(500).send({
-        error: "Falha ao buscar todos os pacientes",
-        message: error,
+      const message = {
+        data: pacientes,
+        method: `pacientesGetAll`,
+        query: "",
+      };
+      await producer.send({
+        topic: "responses",
+        messages: [
+          {
+            value: JSON.stringify(message),
+          },
+        ],
       });
+    } catch (error) {
+      return console.error("Falha ao buscar todos os pacientes.", error);
     }
-  }
-}
+  },
+};
 
-export default new PacienteController();
+export default pacienteController;

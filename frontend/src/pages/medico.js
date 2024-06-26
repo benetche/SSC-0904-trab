@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { path } from "../components/constants";
 function PainelMedico() {
   const [medicamentos, setMedicamentos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,10 +11,8 @@ function PainelMedico() {
     frequencia: "",
     medico: "",
   });
-  const [allReceitas, setAllReceitas] = useState([]);
 
-  const [medicos, setMedicos] = useState([{ nome: "Joao", cpf: "123456" }]);
-  const path = "http://localhost:6018";
+  const [medicos, setMedicos] = useState([]);
   useEffect(() => {
     const method = "getAll";
     fetch(`${path}/api/medicamento/getAll`, {
@@ -41,23 +40,6 @@ function PainelMedico() {
     kafkaConsumer.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setMedicos(data.data);
-      kafkaConsumer.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    const method = "getAll";
-    fetch(`${path}/api/receita/getAll`, {
-      method: "GET",
-    });
-    const kafkaConsumer = new EventSource(
-      `${path}/subscribe/receita/${method}`
-    );
-
-    kafkaConsumer.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log(data.data);
-      setAllReceitas(data.data);
       kafkaConsumer.close();
     };
   }, []);
@@ -102,7 +84,7 @@ function PainelMedico() {
 
   return (
     <div className="container mx-auto p-4 flex gap-4">
-      <div className="w-1/2 p-4 bg-blue-100 rounded-lg shadow">
+      <div className="w-1/2 p-4 bg-blue-100 rounded-lg shadow min-w-96">
         <h2 className="text-xl font-bold mb-4">Medicamentos Disponíveis</h2>
         <input
           type="text"
@@ -111,15 +93,41 @@ function PainelMedico() {
           onChange={handleChange}
           className="w-full px-4 py-2 mb-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        {medicamentos.length > 0 && (
-          <ul>
-            {filteredMedications.map((med) => (
-              <li key={med.codigo} className="mb-2">
-                {med.substancia} ({med.codigo})
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="max-h-96 overflow-y-auto">
+          {/* {medicamentos.length > 0 && (
+            <ul>
+              {filteredMedications.map((med) => (
+                <li key={med.codigo} className="mb-2">
+                  {med.substancia} ({med.codigo})
+                </li>
+              ))}
+            </ul>
+          )} */}
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Código Medicamento
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Substância
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredMedications.map((medicamento) => (
+                <tr key={medicamento.codigo}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {medicamento.codigo}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {medicamento.substancia}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div className="w-1/2 p-4 bg-green-100 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-4">Receita Médica</h2>
@@ -208,22 +216,6 @@ function PainelMedico() {
             Criar Receita
           </button>
         </form>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Todas as receitas:
-          </label>
-          <ul>
-            {allReceitas.length > 0 &&
-              allReceitas.map((receita) => (
-                <li className="mb-2 bg-green-200">
-                  COD: {receita.cod_receita}, PACIENTE: {receita.paciente.nome},
-                  MEDICO: {receita.medico.nome}, PRESCRIÇÃO:
-                  {receita.receituario.medicamento.substancia},{" "}
-                  {receita.receituario.dose}, {receita.receituario.frequencia}
-                </li>
-              ))}
-          </ul>
-        </div>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@ import medicoController from "./controllers/medico-controller.js";
 import farmaceuticoController from "./controllers/farmaceutico-controller.js";
 import postoController from "./controllers/posto-controller.js";
 import receitaController from "./controllers/receita-controller.js";
-import promClient from "prom-client";
+import pacienteController from "./controllers/paciente-controller.js";
 
 // Config kafka
 const kafka = new Kafka({
@@ -15,6 +15,29 @@ const kafka = new Kafka({
 const topic = "requests";
 const consumer = kafka.consumer({ groupId: "request-group" });
 const producer = kafka.producer();
+
+const operationHandlers = {
+  // Pacientes
+  CRIAR_PACIENTE: pacienteController.post,
+  GET_PACIENTE_ALL: pacienteController.getAll,
+  // Remedios
+  CRIAR_REMEDIO: medicamentoController.post,
+  GET_REMEDIO_COD: medicamentoController.getByCodigo,
+  GET_REMEDIO_ALL: medicamentoController.getAll,
+  // Medicos
+  CRIAR_MEDICO: medicoController.post,
+  GET_ALL_MEDICO: medicoController.getAll,
+  // Farmaceutico
+  CRIAR_FARMACEUTICO: farmaceuticoController.post,
+  // Posto
+  CRIAR_POSTO: postoController.post,
+  GET_POSTO_CODIGO: postoController.getByCodigo,
+  GET_POSTO_FARMACEUTICO: postoController.getPostoFarmaceutico,
+  UPDATE_POSTO_ESTOQUE: postoController.updatePostoEstoque,
+  // Receita
+  CRIAR_RECEITA: receitaController.post,
+  GET_RECEITA_ALL: receitaController.getAll,
+};
 
 async function run() {
   // Connect the producer
@@ -30,42 +53,11 @@ async function run() {
       const data = JSON.parse(message.value).dados;
       const operation = JSON.parse(message.value).operation;
       console.log(data, operation);
-      switch (operation) {
-        //Remedios
-        case "CRIAR_REMEDIO":
-          await medicamentoController.post(data, producer);
-          break;
-        case "GET_REMEDIO_COD":
-          await medicamentoController.getByCodigo(data, producer);
-          break;
-        case "GET_REMEDIO_ALL":
-          await medicamentoController.getAll(data, producer);
-          break;
-        //Medicos
-        case "CRIAR_MEDICO":
-          await medicoController.post(data, producer);
-          break;
-        case "GET_ALL_MEDICO":
-          await medicoController.getAll(data, producer);
-          break;
-        // Farmaceutico
-        case "CRIAR_FARMACEUTICO":
-          await farmaceuticoController.post(data, producer);
-          break;
-        // Posto
-        case "CRIAR_POSTO":
-          await postoController.post(data, producer);
-          break;
-        case "GET_POSTO_NOME":
-          await postoController.getByNome(data, producer);
-          break;
-        // Receita
-        case "CRIAR_RECEITA":
-          await receitaController.post(data, producer);
-          break;
-        case "GET_RECEITA_ALL":
-          await receitaController.getAll(data, producer);
-          break;
+      const handler = operationHandlers[operation];
+      if (handler) {
+        await handler(data, producer);
+      } else {
+        console.error(`Operation ${operation} not supported.`);
       }
     },
   });
