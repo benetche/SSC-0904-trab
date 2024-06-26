@@ -1,9 +1,8 @@
 // src/pages/GestaoReceitas.js
 import React, { useState, useEffect } from "react";
-
+import { path } from "../components/constants";
 const GestaoReceitas = ({ receitas, deleteReceita, updateReceita }) => {
   const [allReceitas, setAllReceitas] = useState([]);
-  const path = "http://localhost:6018";
   useEffect(() => {
     const method = "getAll";
     fetch(`${path}/api/receita/getAll`, {
