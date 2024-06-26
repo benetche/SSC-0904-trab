@@ -1,1 +1,1 @@
-export const path = "http://localhost:6018";
+export const path = "http://andromeda.lasdpc.icmc.usp.br:6018";

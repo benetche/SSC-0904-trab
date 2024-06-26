@@ -1,5 +1,5 @@
 config:
-  target: http://localhost:6018
+  target: http://andromeda.lasdpc.icmc.usp.br:6018
   phases:
     - duration: 30
       arrivalRate: 1
