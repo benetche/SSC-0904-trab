@@ -1,12 +1,5 @@
 # gsdgrad08
 
-## Grupo
-
-- Pedro Henrique Conrado F. de Oliveira - 11819091
-- Vítor Beneti Martins - 11877635
-- Melissa Motoki Nogueira - 5588687
-- Vinícius Rodrigues Ribeiro - 9779440
-
 ## Acessando a máquina virtual
 
 Para acessar a VM do Cluster ICMC, rodar:
